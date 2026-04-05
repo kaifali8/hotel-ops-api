@@ -1,6 +1,4 @@
 package com.example.hotel_ops.config;
-
-import com.example.hotel_ops.entity.User;
 import com.example.hotel_ops.filter.JwtAuthenticationFilter;
 import com.example.hotel_ops.service.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -32,6 +30,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/rooms/available").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
