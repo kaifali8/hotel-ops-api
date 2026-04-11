@@ -2,6 +2,7 @@ package com.example.hotel_ops.filter;
 
 import com.example.hotel_ops.service.CustomUserDetailsService;
 import com.example.hotel_ops.util.JwtService;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -53,8 +54,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
                 }
+        }catch (ExpiredJwtException exception){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"message\": \"Token has expired please login again.\"}");
+            return;
         }catch (Exception e){
-            System.out.println("Error:"+e);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"message\": \"Invalid token.\"}");
+            return;
         }
         filterChain.doFilter(request,response);
     }

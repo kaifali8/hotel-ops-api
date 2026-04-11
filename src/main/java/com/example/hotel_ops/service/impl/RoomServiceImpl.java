@@ -1,10 +1,13 @@
 package com.example.hotel_ops.service.impl;
 
 import com.example.hotel_ops.dto.request.RoomCreateRequest;
+import com.example.hotel_ops.dto.request.RoomStatusUpdateRequest;
+import com.example.hotel_ops.dto.request.RoomUpdateRequest;
 import com.example.hotel_ops.dto.response.RoomResponse;
 import com.example.hotel_ops.entity.Room;
 import com.example.hotel_ops.enums.RoomStatus;
 import com.example.hotel_ops.exception.ResourceAlreadyExistsException;
+import com.example.hotel_ops.exception.ResourceNotFoundException;
 import com.example.hotel_ops.repository.RoomRepository;
 import com.example.hotel_ops.service.RoomService;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +44,62 @@ public class RoomServiceImpl implements RoomService {
                 .roomType(savedRoom.getRoomType())
                 .pricePerNight(savedRoom.getPricePerNight())
                 .capacity(savedRoom.getCapacity())
+                .status(savedRoom.getStatus())
+                .active(savedRoom.getActive())
+                .build();
+    }
+
+    public RoomResponse updateRoom(Long id, RoomUpdateRequest request){
+        Room room=roomRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("Room not found"));
+        if(request.getRoomType() != null){
+            room.setRoomType(request.getRoomType());
+        }
+        if (request.getPricePerNight()!=null){
+            room.setPricePerNight(request.getPricePerNight());
+        }
+        if (request.getCapacity()!=null){
+            room.setCapacity(request.getCapacity());
+        }
+        if (request.getFloorNumber()!=null){
+            room.setFloorNumber(request.getFloorNumber());
+        }
+        Room savedRoom=roomRepository.save(room);
+        return RoomResponse.builder()
+                .id(savedRoom.getId())
+                .roomNumber(savedRoom.getRoomNumber())
+                .roomType(savedRoom.getRoomType())
+                .pricePerNight(savedRoom.getPricePerNight())
+                .capacity(savedRoom.getCapacity())
+                .floorNumber(savedRoom.getFloorNumber())
+                .status(savedRoom.getStatus())
+                .active(savedRoom.getActive())
+                .build();
+    }
+
+    @Override
+    public void deactivateRoom(Long id) {
+        Room room=roomRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("Room not found"));
+        room.setActive(false);
+        roomRepository.save(room);
+    }
+
+    @Override
+    public RoomResponse updateRoomStatus(Long id, RoomStatusUpdateRequest request) {
+        Room room=roomRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("Room not found"));
+        if (room.getStatus()!= null){
+            room.setStatus(request.getStatus());
+        }
+        Room savedRoom=roomRepository.save(room);
+        return RoomResponse.builder()
+                .id(savedRoom.getId())
+                .roomNumber(savedRoom.getRoomNumber())
+                .roomType(savedRoom.getRoomType())
+                .pricePerNight(savedRoom.getPricePerNight())
+                .capacity(savedRoom.getCapacity())
+                .floorNumber(savedRoom.getFloorNumber())
                 .status(savedRoom.getStatus())
                 .active(savedRoom.getActive())
                 .build();

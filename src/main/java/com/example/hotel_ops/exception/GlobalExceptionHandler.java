@@ -35,4 +35,6 @@ public class GlobalExceptionHandler {
         error.put("message",e.getMessage());
         return new ResponseEntity<>(error,HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+
 }
