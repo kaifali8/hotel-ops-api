@@ -29,12 +29,18 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error,HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String,String>> handleResourceNotFoundError(ResourceNotFoundException e){
+        Map<String,String> error = new HashMap<>();
+        error.put("message",e.getMessage());
+        return new ResponseEntity<>(error,HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String,String>> handleGenericError(Exception e){
         Map<String,String> error = new HashMap<>();
         error.put("message",e.getMessage());
         return new ResponseEntity<>(error,HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
 
 }
