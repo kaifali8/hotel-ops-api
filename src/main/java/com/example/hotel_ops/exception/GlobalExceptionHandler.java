@@ -43,4 +43,10 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(BookingConflictException.class)
+    public ResponseEntity<Map<String,String>> handleBookingConflict(BookingConflictException e){
+        Map<String ,String> error = new HashMap<>();
+        error.put("message",e.getMessage());
+        return new ResponseEntity<>(error,HttpStatus.CONFLICT);
+    }
 }
