@@ -16,6 +16,10 @@ import com.example.hotel_ops.repository.RoomRepository;
 import com.example.hotel_ops.repository.UserRepository;
 import com.example.hotel_ops.service.BookingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -109,18 +113,22 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponse> getMyBookings(String userEmail,BookingStatus status) {
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(()-> new ResourceNotFoundException("User not found"));
-        List<Booking> bookings = new ArrayList<>();
-        if (status != null){
-            bookings=bookingRepository.findByUserEmailAndStatus(userEmail,status);
-        }else {
-            bookings= bookingRepository.findByUserEmail(userEmail);
-        }
-        List<BookingResponse> bookingResponses= new ArrayList<>();
+    public Page<BookingResponse> getMyBookings(String userEmail, BookingStatus status, int page, int size) {
 
-        UserResponse userResponse= UserResponse.builder()
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+        Page<Booking> bookingPage;
+
+        if (status != null) {
+            bookingPage = bookingRepository.findByUserAndStatus(user, status, pageable);
+        } else {
+            bookingPage = bookingRepository.findByUser(user, pageable);
+        }
+
+        UserResponse userResponse = UserResponse.builder()
                 .id(user.getId())
                 .fullName(user.getFullName())
                 .email(user.getEmail())
@@ -129,11 +137,11 @@ public class BookingServiceImpl implements BookingService {
                 .active(user.getActive())
                 .build();
 
+        return bookingPage.map(booking -> {
 
-        for(Booking booking: bookings){
+            Room room = booking.getRoom();
 
-            Room room=booking.getRoom();
-            RoomResponse roomResponse=RoomResponse.builder()
+            RoomResponse roomResponse = RoomResponse.builder()
                     .id(room.getId())
                     .roomNumber(room.getRoomNumber())
                     .roomType(room.getRoomType())
@@ -144,7 +152,7 @@ public class BookingServiceImpl implements BookingService {
                     .status(room.getStatus())
                     .build();
 
-            BookingResponse bookingResponse = BookingResponse.builder()
+            return BookingResponse.builder()
                     .id(booking.getId())
                     .user(userResponse)
                     .room(roomResponse)
@@ -153,9 +161,7 @@ public class BookingServiceImpl implements BookingService {
                     .totalPrice(booking.getTotalPrice())
                     .status(booking.getStatus())
                     .build();
-            bookingResponses.add(bookingResponse);
-        }
-        return bookingResponses;
+        });
     }
 
     @Override
@@ -184,18 +190,22 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponse> getAllBookings(BookingStatus status) {
-        List<Booking> bookings= new ArrayList<>();
-        if (status != null){
-            bookings=bookingRepository.findByStatus(status);
-        }else {
-            bookings= bookingRepository.findAll();
-        }
-        List<BookingResponse> bookingResponses= new ArrayList<>();
+    public Page<BookingResponse> getAllBookings(BookingStatus status,int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
-        for(Booking booking: bookings){
-            Room room=booking.getRoom();
-            RoomResponse roomResponse=RoomResponse.builder()
+        Page<Booking> bookingPage;
+
+        if (status != null) {
+            bookingPage = bookingRepository.findByStatus(status, pageable);
+        } else {
+            bookingPage = bookingRepository.findAll(pageable);
+        }
+
+        return bookingPage.map(booking -> {
+
+            Room room = booking.getRoom();
+            User user = booking.getUser();
+            RoomResponse roomResponse = RoomResponse.builder()
                     .id(room.getId())
                     .roomNumber(room.getRoomNumber())
                     .roomType(room.getRoomType())
@@ -205,7 +215,6 @@ public class BookingServiceImpl implements BookingService {
                     .active(room.getActive())
                     .status(room.getStatus())
                     .build();
-            User user=booking.getUser();
             UserResponse userResponse= UserResponse.builder()
                     .id(user.getId())
                     .fullName(user.getFullName())
@@ -215,7 +224,7 @@ public class BookingServiceImpl implements BookingService {
                     .active(user.getActive())
                     .build();
 
-            BookingResponse bookingResponse = BookingResponse.builder()
+            return BookingResponse.builder()
                     .id(booking.getId())
                     .user(userResponse)
                     .room(roomResponse)
@@ -224,12 +233,6 @@ public class BookingServiceImpl implements BookingService {
                     .totalPrice(booking.getTotalPrice())
                     .status(booking.getStatus())
                     .build();
-            if (booking.getStatus().equals(status)){
-                bookingResponses.add(bookingResponse);
-            } else if (status==null) {
-                bookingResponses.add(bookingResponse);
-            }
-        }
-        return bookingResponses;
+        });
     }
 }

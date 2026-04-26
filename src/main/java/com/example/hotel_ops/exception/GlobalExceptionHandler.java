@@ -1,11 +1,14 @@
 package com.example.hotel_ops.exception;
 
+import com.example.hotel_ops.dto.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,10 +33,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Map<String,String>> handleResourceNotFoundError(ResourceNotFoundException e){
-        Map<String,String> error = new HashMap<>();
-        error.put("message",e.getMessage());
-        return new ResponseEntity<>(error,HttpStatus.NOT_FOUND);
+    public ResponseEntity<ErrorResponse> handleResourceNotFoundError(ResourceNotFoundException e){
+        return new ResponseEntity<>(
+                new ErrorResponse(false, e.getMessage(),
+                    404, LocalDateTime.now()),HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)

@@ -1,7 +1,10 @@
 package com.example.hotel_ops.repository;
 
 import com.example.hotel_ops.entity.Booking;
+import com.example.hotel_ops.entity.User;
 import com.example.hotel_ops.enums.BookingStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -23,7 +26,11 @@ public interface BookingRepository extends JpaRepository<Booking,Long> {
 
     List<Booking> findByUserEmail(String email);
 
+    Page<Booking> findByUser(User user, Pageable pageable);
+
+    Page<Booking> findByUserAndStatus(User user,BookingStatus status,Pageable pageable);
+
     List<Booking> findByUserEmailAndStatus(String email, BookingStatus status);
 
-    List<Booking> findByStatus(BookingStatus status);
+    Page<Booking> findByStatus(BookingStatus status,Pageable pageable);
 }
