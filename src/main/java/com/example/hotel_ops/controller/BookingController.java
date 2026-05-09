@@ -5,6 +5,8 @@ import com.example.hotel_ops.dto.response.ApiResponse;
 import com.example.hotel_ops.dto.response.BookingResponse;
 import com.example.hotel_ops.enums.BookingStatus;
 import com.example.hotel_ops.service.BookingService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,10 +21,12 @@ import java.util.List;
 @Controller
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@Tag(name = "Booking", description = "Reservation Booking APIs")
 public class BookingController {
 
     private final BookingService bookingService;
 
+    @Operation(summary = "Create a new booking")
     @PostMapping("/bookings")
     public ResponseEntity<ApiResponse<BookingResponse>> createBooking(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -37,6 +41,7 @@ public class BookingController {
         );
     }
 
+    @Operation(summary = "Get all my bookings")
     @GetMapping("/bookings/my")
     public ResponseEntity<ApiResponse<Page<BookingResponse>>> getMyBookings(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -52,6 +57,7 @@ public class BookingController {
                 ));
     }
 
+    @Operation(summary = "Cancel my booking")
     @PatchMapping("/bookings/{bookingId}/cancel")
     public ResponseEntity<Void> cancelBooking(@PathVariable Long bookingId,@AuthenticationPrincipal UserDetails userDetails){
         String email = userDetails.getUsername();
@@ -59,6 +65,7 @@ public class BookingController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Get all the bookings")
     @GetMapping("/admin/bookings")
     public ResponseEntity<ApiResponse<Page<BookingResponse>>> getAllBookings(
             @RequestParam(required = false) BookingStatus status,
