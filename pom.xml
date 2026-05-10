@@ -92,7 +92,7 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
+	<packaging>jar</packaging>
 	<build>
 		<plugins>
 			<!-- Compiler Plugin for Java 21 + Lombok Annotation Processing -->
