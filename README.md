@@ -1,17 +1,30 @@
 # Hotel Ops API
 
-A backend hotel booking and operations management system built using:
+A production-style hotel booking backend system built with Spring Boot.
 
-- Java
-- Spring Boot
-- Spring Security
-- Hibernate / JPA
+## Tech Stack
+- Java 21, Spring Boot 3
+- Spring Security + JWT Authentication
+- Hibernate / Spring Data JPA
 - MySQL
-- Postman
+- Docker
 
-## Features (Planned)
-- User authentication & authorization
-- Hotel management
-- Room management
-- Booking system
-- Check-in / Check-out workflow
+## Features
+- JWT-based authentication & role-based access control
+- Room management (CRUD, status, soft delete)
+- Booking management with overlap conflict detection
+- Pagination & filtering
+- Global exception handling
+- Standardized API responses
+
+## Live API
+Base URL: https://hotel-ops-api-w8dy.onrender.com  
+Swagger UI: https://hotel-ops-api-w8dy.onrender.com/swagger-ui/index.html
+
+## Run Locally
+\`\`\`bash
+git clone https://github.com/kaifali8/hotel-ops-api
+cd hotel-ops-api
+# Add application-dev.properties with your DB config
+./mvnw spring-boot:run
+\`\`\`
